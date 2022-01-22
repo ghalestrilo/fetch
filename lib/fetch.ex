@@ -26,13 +26,28 @@ defmodule Fetch do
     {:ok, %{assets: [], links: []}}
   end
 
-  @spec extract_tags(data :: String.t(), tags :: [atom]) :: {atom, [any]}
-  def extract_tags(_data, _tags) do
-    {:ok, []}
+  @spec extract_tags(data :: String.t(), tags :: [String.t()]) :: {atom, %{String.t() => [any]}}
+  def extract_tags(data, tags) do
+    result =
+      tags
+      |> Enum.map(fn tag ->
+        {
+          tag,
+          Floki.find(data, tag)
+          |> Enum.map(fn {tag, attrs, _children} -> {tag, attrs} end)
+        }
+      end)
+      |> Map.new()
+
+    {:ok, result}
   end
 
   @spec get_body(url :: String.t()) :: {atom, String.t()}
-  def get_body(_url) do
-    {:ok, ""}
+  def get_body(url) do
+    with {:ok, %HTTPoison.Response{body: body}} <- HTTPoison.get(url) do
+      {:ok, body}
+    else
+      error -> error
+    end
   end
 end

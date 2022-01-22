@@ -21,7 +21,8 @@ defmodule Fetch.MixProject do
     [
       {:httpoison, "~> 1.8"},
       {:floki, "~> 0.32.0"},
-      {:mox, "~> 0.5", only: :test}
+      {:jason, "~> 1.2"},
+      {:mock, "~> 0.3.0", only: :test}
     ]
   end
 end
