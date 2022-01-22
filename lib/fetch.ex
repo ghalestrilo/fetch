@@ -21,18 +21,21 @@ defmodule Fetch do
       }
   """
 
-  @spec fetch(url :: String.t()) :: {atom, %{assets: [String.t()], links: [String.t()]}}
-  def fetch(url) do
-    tags = [{"img", "src"}, {"a", "ref"}]
+  @spec fetch(url :: String.t()) :: {atom, %{atom => [String.t()]}}
+  def fetch(url, data_to_retrieve \\ [{"img", "src", :assets}, {"a", "href", :links}]) do
+    tags_to_extract = data_to_retrieve |> Enum.map(fn {tagname, _, _} -> tagname end)
 
     with {:ok, html} <- get_body(url),
-         {:ok, result} <- extract_tags(html, ["img", "a"]) do
-      %{"a" => a_tags, "img" => img_tags} = result
+         {:ok, tagdata} <- extract_tags(html, tags_to_extract) do
+      result =
+        data_to_retrieve
+        |> Enum.map(fn {tagname, attrname, fieldname} ->
+          {fieldname, tagdata |> Map.get(tagname) |> Enum.map(&get_attr(&1, attrname))}
+        end)
+        |> Map.new()
+        |> IO.inspect()
 
-      assets = img_tags |> Enum.map(&get_attr(&1, "src"))
-      links = a_tags |> Enum.map(&get_attr(&1, "href"))
-
-      {:ok, %{assets: assets, links: links}}
+      {:ok, result}
     else
       error -> error |> IO.inspect(label: "error")
     end
