@@ -41,9 +41,9 @@ Fetch.fetch("http://...", [{"img", "src", :assets}])
 Improvements I would've made if there was more time:
 
 1. **Sad-path testing:** right now, the only test-covered flow is `{:ok, _}`, for all functions. Among other exception scenarios, these are important to test:
-  - A bad URL is passed
-  - Payload not HTML (requesting from an API, from instance)
-  - Broken HTML payload
+   - A bad URL is passed
+   - Payload not HTML (requesting from an API, from instance)
+   - Broken HTML payload
 2. **Comments and overall code clarity:** The code is ok in terms of structure, but adding comments, naming a couple lambdas and other small adjustments would make it clearer 
 3. **Split Modules:** The solution was coded completely inside the same module. While not a problem for a module this size, given that it will run in a server as part of a larger app, it may grow larger towards the future. With this in mind, avoiding unnecesary coupling is a good idea.
 4. **Types:** Some basic typing was implemented for the `Fetch` module methods, but some of them use `any()` or type constructs that could be extracted and named.
