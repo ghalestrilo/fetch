@@ -21,9 +21,27 @@ defmodule Fetch do
       }
   """
 
-  @spec fetch(url :: String.t()) :: {atom, %{assets: [String.t()], links: [String.t()]}}
-  def fetch(_url) do
-    {:ok, %{assets: [], links: []}}
+  @spec fetch(url :: String.t()) :: {atom, %{atom => [String.t()]}}
+  def fetch(url, data_to_retrieve \\ [{"img", "src", :assets}, {"a", "href", :links}]) do
+    tags_to_extract = data_to_retrieve |> Enum.map(fn {tagname, _, _} -> tagname end)
+
+    with {:ok, html} <- get_body(url),
+         {:ok, tagdata} <- extract_tags(html, tags_to_extract) do
+      result =
+        data_to_retrieve
+        |> Enum.map(fn {tagname, attrname, fieldname} ->
+          {fieldname, tagdata |> Map.get(tagname) |> Enum.map(&get_attr(&1, attrname))}
+        end)
+        |> Map.new()
+
+      {:ok, result}
+    else
+      error -> error
+    end
+  end
+
+  def get_attr({_tag, attrs}, attrname) do
+    attrs |> Map.new() |> Map.get(attrname, "")
   end
 
   @spec extract_tags(data :: String.t(), tags :: [String.t()]) :: {atom, %{String.t() => [any]}}
@@ -34,7 +52,9 @@ defmodule Fetch do
         {
           tag,
           Floki.find(data, tag)
-          |> Enum.map(fn {tag, attrs, _children} -> {tag, attrs} end)
+          |> Enum.map(fn {tag, attrs, _children} ->
+            {tag, attrs}
+          end)
         }
       end)
       |> Map.new()

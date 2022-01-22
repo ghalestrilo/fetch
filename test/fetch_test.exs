@@ -1,9 +1,25 @@
 defmodule FetchTest do
   use ExUnit.Case, async: false
+  import Mock
 
-  doctest Fetch
+  # doctest Fetch
 
   @success_body File.read!("test/mocks/crawler_test.html")
+
+  @links [
+    "/",
+    "https://crawler-test.com/",
+    "https://crawler-test.com/",
+    "https://crawler-test.com/",
+    "https://crawler-test.com/image_link.png"
+  ]
+
+  @assets ["/image_link.png", "/image_link.png", "/image_link.png", "/image_link.png"]
+
+  defp httpoison_mock(),
+    do:
+      {HTTPoison, [:passthrough],
+       get: fn _ -> {:ok, %HTTPoison.Response{body: @success_body}} end}
 
   describe "get_body/2" do
     test "passes" do
@@ -24,9 +40,29 @@ defmodule FetchTest do
     end
   end
 
-  describe "fetch/1" do
-    test "passes" do
-      :ok
+  describe "fetch/1 with a good URL" do
+    setup_with_mocks([httpoison_mock()]) do
+      %{result: Fetch.fetch(@url)}
+    end
+
+    test "returns :ok", %{result: result} do
+      assert {:ok, _} = result
+    end
+
+    test "returns correct assets/links count", %{result: result} do
+      assert {:ok, %{assets: assets, links: links}} = result
+      assert Enum.count(assets) == Enum.count(@assets)
+      assert Enum.count(links) == Enum.count(@links)
+    end
+
+    test "returns correct assets", %{result: result} do
+      assert {:ok, %{assets: assets}} = result
+      assert assets == @assets
+    end
+
+    test "returns correct links", %{result: result} do
+      assert {:ok, %{links: links}} = result
+      assert links == @links
     end
   end
 end
