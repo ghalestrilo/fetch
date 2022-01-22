@@ -1,21 +1,30 @@
 # Fetch
 
-**TODO: Add description**
+This program allows you to retrieve data from HTTP webpages. 
+It does so through the fetch/1 method, which receives an URL an returns a map containing links and assets of that page.
+Its overload, fetch/2, allows you to parameterize which tags and attributes you wish to retrieve, as well as naming the resulting array field on the output map.
 
-## Installation
+## Dependencies
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `fetch` to your list of dependencies in `mix.exs`:
+This library depends on [HTTPoison](https://github.com/edgurgel/httpoison) for HTTP requests and [Floki](https://github.com/philss/floki) for HTTP parsing, as well as Mock and Jason for testing.
 
-```elixir
-def deps do
-  [
-    {:fetch, "~> 0.1.0"}
-  ]
-end
+## Running
+
+Before running you must install the project dependencies. You can do so with
+
+```bash
+$ mix deps.get
+$ mix deps.compile
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/fetch](https://hexdocs.pm/fetch).
+Then, you can start an IEx session with `iex -S mix`, and running the method 
 
+```elixir
+Fetch.fetch("http://...")
+#  {:ok, %{ links: [...], assets: [...] }
+
+Fetch.fetch("http://...", [{"img", "src", :assets}])
+#  {:ok, %{ assets: [...] }
+```
+
+##
