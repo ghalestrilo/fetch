@@ -33,11 +33,10 @@ defmodule Fetch do
           {fieldname, tagdata |> Map.get(tagname) |> Enum.map(&get_attr(&1, attrname))}
         end)
         |> Map.new()
-        |> IO.inspect()
 
       {:ok, result}
     else
-      error -> error |> IO.inspect(label: "error")
+      error -> error
     end
   end
 

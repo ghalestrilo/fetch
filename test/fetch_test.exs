@@ -7,8 +7,6 @@ defmodule FetchTest do
   @success_body File.read!("test/mocks/crawler_test.html")
 
   @links [
-    "/css/app.css",
-    "/favicon.ico?r=1.6",
     "/",
     "https://crawler-test.com/",
     "https://crawler-test.com/",
