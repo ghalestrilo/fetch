@@ -20,7 +20,8 @@ defmodule Fetch.MixProject do
   defp deps do
     [
       {:httpoison, "~> 1.8"},
-      {:floki, "~> 0.32.0"}
+      {:floki, "~> 0.32.0"},
+      {:mox, "~> 0.5", only: :test}
     ]
   end
 end
