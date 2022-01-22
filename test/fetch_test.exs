@@ -2,7 +2,7 @@ defmodule FetchTest do
   use ExUnit.Case, async: false
   import Mock
 
-  doctest Fetch
+  # doctest Fetch
 
   @success_body File.read!("test/mocks/crawler_test.html")
 
@@ -17,6 +17,11 @@ defmodule FetchTest do
   ]
 
   @assets ["/image_link.png", "/image_link.png", "/image_link.png", "/image_link.png"]
+
+  defp httpoison_mock(),
+    do:
+      {HTTPoison, [:passthrough],
+       get: fn _ -> {:ok, %HTTPoison.Response{body: @success_body}} end}
 
   describe "get_body/2" do
     test "passes" do
@@ -38,7 +43,7 @@ defmodule FetchTest do
   end
 
   describe "fetch/1 with a good URL" do
-    setup_with_mocks([{Fetch, [:passthrough], get_body: fn _ -> {:ok, @success_body} end}]) do
+    setup_with_mocks([httpoison_mock()]) do
       %{result: Fetch.fetch(@url)}
     end
 
